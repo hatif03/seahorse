@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View, Image, TextInput } from 'react-native'
-import React from 'react'
+import React, {useState} from 'react'
 import { themeColors } from '../../themes'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AntDesign } from '@expo/vector-icons';
@@ -8,6 +8,8 @@ import relax from "../../assets/images/relax.png"
 import google from "../../assets/images/google.png"
 import apple from "../../assets/images/apple.png"
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 
 
 
@@ -15,7 +17,19 @@ type Props = {}
 
 const LoginScreen = (props: Props) => {
 
-  const navigation= useNavigation()
+  const navigation= useNavigation();
+  const [email, setEmail] = useState(null)
+  const [password, setPassword] = useState(null);
+
+  const handleSubmit = async ()=> {
+    if(email && password){
+      try{
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch(err){
+        console.log("err caught: ", err);
+      }
+    }
+  };
 
   return (
     <View className=" flex-1 bg-white" style={{backgroundColor: themeColors.bg}}>
@@ -36,21 +50,25 @@ const LoginScreen = (props: Props) => {
             <Text className="text-gray-700 ml-4">Email Address</Text>
             <TextInput 
               className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-3"
+              value={email}
+              onChangeText={value=>setEmail(value)}
               placeholder="email"
-              value="john@gmail.com" 
             />
             <Text className="text-gray-700 ml-4">Password</Text>
             <TextInput 
               className="p-4 bg-gray-100 text-gray-700 rounded-2xl"
               secureTextEntry
-              placeholder="password"
-              value="test12345" 
+              placeholder="password" 
+              value={password}
+              onChangeText={value=>setPassword(value)}
             />
             <TouchableOpacity className="flex items-end">
               <Text className="text-gray-700 mb-5">Forgot Password?</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              className="py-3 bg-yellow-400 rounded-xl">
+              className="py-3 bg-yellow-400 rounded-xl"
+              onPress={handleSubmit}
+              >
                 <Text 
                     className="text-xl font-bold text-center text-gray-700"
                 >

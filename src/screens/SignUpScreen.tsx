@@ -1,19 +1,35 @@
 import { Text, TouchableOpacity, View, Image, TextInput } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { themeColors } from '../../themes'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import relax2 from "../../assets/images/relax2.png"
-import google from "../../assets/images/google.png"
-import apple from "../../assets/images/apple.png"
+import relax2 from "../../assets/images/relax2.png";
+import google from "../../assets/images/google.png";
+import apple from "../../assets/images/apple.png";
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 
 type Props = {}
 
 const SignUpScreen = (props: Props) => {
 
-  const navigation= useNavigation()
+  const navigation= useNavigation();
+
+  const [name, setName] = useState(null);
+  const [email, setEmail] = useState(null)
+  const [password, setPassword] = useState(null);
+
+  const handleSubmit = async ()=> {
+    if(email && password){
+      try{
+        await createUserWithEmailAndPassword(auth, email, password);
+      } catch(err){
+        console.log("err caught: ", err);
+      }
+    }
+  };
 
   return (
     <View className=" flex-1 bg-white" style={{backgroundColor: themeColors.bg}}>
@@ -34,24 +50,28 @@ const SignUpScreen = (props: Props) => {
                 <Text className="text-gray-700 ml-4">Full Name</Text>
                 <TextInput
                     className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-3"
-                    value="John Snow"
+                    value={name}
+                    onChangeText={value=>setName(value)}
                     placeholder='Enter Name'
                 />
                 <Text className="text-gray-700 ml-4">Email Address</Text>
                 <TextInput
                     className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-3"
-                    value="john@gmail.com"
+                    value={email}
+                    onChangeText={value=>setEmail(value)}
                     placeholder='Enter Email'
                 />
                 <Text className="text-gray-700 ml-4">Password</Text>
                 <TextInput
                     className="p-4 bg-gray-100 text-gray-700 rounded-2xl mb-7"
                     secureTextEntry
-                    value="test12345"
+                    value={password}
+                    onChangeText={value=>setPassword(value)}
                     placeholder='Enter Password'
                 />
                 <TouchableOpacity
                     className="py-3 bg-yellow-400 rounded-xl"
+                    onPress={handleSubmit}
                 >
                     <Text className="font-xl font-bold text-center text-gray-700">
                         Sign Up
